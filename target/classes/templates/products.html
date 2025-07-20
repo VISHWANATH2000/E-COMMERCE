@@ -40,7 +40,6 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="/">E-commerce Store</a>
@@ -67,8 +66,6 @@
             </div>
         </div>
     </nav>
-
-    <!-- Search Section -->
     <section class="search-container">
         <div class="container">
             <div class="row justify-content-center">
@@ -85,11 +82,8 @@
             </div>
         </div>
     </section>
-
-    <!-- Products Section -->
     <section class="py-5">
         <div class="container">
-            <!-- Products Grid -->
             <div class="row" id="productsContainer">
                 <div th:each="product : ${products}" class="col-md-4 col-lg-3 mb-4">
                     <div class="card product-card">
@@ -108,15 +102,11 @@
                     </div>
                 </div>
             </div>
-
-            <!-- No Products Message -->
             <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
                 <i class="fas fa-search fa-3x text-muted mb-3"></i>
                 <h4>No products found</h4>
                 <p class="text-muted">Try adjusting your search criteria</p>
             </div>
-
-            <!-- Pagination -->
             <div th:if="${totalPages > 1}" class="d-flex justify-content-center mt-4">
                 <nav>
                     <ul class="pagination">
@@ -136,27 +126,20 @@
             </div>
         </div>
     </section>
-
-    <!-- Alert Container -->
     <div id="alertContainer" style="position: fixed; top: 20px; right: 20px; z-index: 1050;"></div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Search functionality
         document.getElementById('searchForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const searchTerm = document.getElementById('searchInput').value;
             window.location.href = `/products?search=${encodeURIComponent(searchTerm)}`;
         });
-
-        // Add to cart functionality
         async function addToCart(productId) {
             const token = localStorage.getItem('jwtToken');
             if (!token) {
                 showAlert('Please login first', 'warning');
                 return;
             }
-
             try {
                 const response = await fetch('/api/cart/add', {
                     method: 'POST',
@@ -169,7 +152,6 @@
                         quantity: 1
                     })
                 });
-
                 if (response.ok) {
                     showAlert('Product added to cart successfully!', 'success');
                 } else {
@@ -179,20 +161,15 @@
                 showAlert('An error occurred. Please try again.', 'danger');
             }
         }
-
-        // Show alert messages
         function showAlert(message, type) {
             const alertContainer = document.getElementById('alertContainer');
             const alertId = 'alert-' + Date.now();
-            
             alertContainer.innerHTML += `
                 <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `;
-
-            // Auto-remove alert after 3 seconds
             setTimeout(() => {
                 const alert = document.getElementById(alertId);
                 if (alert) {

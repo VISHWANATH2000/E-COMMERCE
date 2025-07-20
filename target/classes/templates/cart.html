@@ -32,7 +32,6 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="/">E-commerce Store</a>
@@ -59,20 +58,12 @@
             </div>
         </div>
     </nav>
-
-    <!-- Cart Section -->
     <section class="py-5">
         <div class="container">
             <h2 class="mb-4">
                 <i class="fas fa-shopping-cart"></i> Shopping Cart
             </h2>
-
-            <!-- Cart Items Container -->
-            <div id="cartItemsContainer">
-                <!-- Cart items will be loaded here -->
-            </div>
-
-            <!-- Empty Cart Message -->
+            <div id="cartItemsContainer"></div>
             <div id="emptyCart" class="empty-cart text-center" style="display: none;">
                 <div>
                     <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
@@ -83,8 +74,6 @@
                     </a>
                 </div>
             </div>
-
-            <!-- Cart Summary -->
             <div id="cartSummary" class="card mt-4" style="display: none;">
                 <div class="card-body">
                     <div class="row">
@@ -106,32 +95,24 @@
             </div>
         </div>
     </section>
-
-    <!-- Alert Container -->
     <div id="alertContainer" style="position: fixed; top: 20px; right: 20px; z-index: 1050;"></div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Load cart on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadCart();
         });
-
-        // Load cart items
         async function loadCart() {
             const token = localStorage.getItem('jwtToken');
             if (!token) {
                 showAlert('Please login first', 'warning');
                 return;
             }
-
             try {
                 const response = await fetch('/api/cart', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-
                 if (response.ok) {
                     const cart = await response.json();
                     displayCart(cart);
@@ -142,31 +123,24 @@
                 showAlert('An error occurred while loading cart', 'danger');
             }
         }
-
-        // Display cart items
         function displayCart(cart) {
             const container = document.getElementById('cartItemsContainer');
             const emptyCart = document.getElementById('emptyCart');
             const cartSummary = document.getElementById('cartSummary');
-
             if (!cart.items || cart.items.length === 0) {
                 container.innerHTML = '';
                 emptyCart.style.display = 'block';
                 cartSummary.style.display = 'none';
                 return;
             }
-
             emptyCart.style.display = 'none';
             cartSummary.style.display = 'block';
-
             let totalItems = 0;
             let totalPrice = 0;
-
             const itemsHtml = cart.items.map(item => {
                 const itemTotal = item.product.price * item.quantity;
                 totalItems += item.quantity;
                 totalPrice += itemTotal;
-
                 return `
                     <div class="card cart-item mb-3">
                         <div class="card-body">
@@ -202,16 +176,12 @@
                     </div>
                 `;
             }).join('');
-
             container.innerHTML = itemsHtml;
             document.getElementById('totalItems').textContent = totalItems;
             document.getElementById('totalPrice').textContent = totalPrice.toFixed(2);
         }
-
-        // Update item quantity
         async function updateQuantity(itemId, quantity) {
             if (quantity < 1) return;
-
             const token = localStorage.getItem('jwtToken');
             try {
                 const response = await fetch(`/api/cart/item/${itemId}`, {
@@ -222,7 +192,6 @@
                     },
                     body: JSON.stringify({ quantity: parseInt(quantity) })
                 });
-
                 if (response.ok) {
                     loadCart();
                     showAlert('Cart updated successfully', 'success');
@@ -233,8 +202,6 @@
                 showAlert('An error occurred', 'danger');
             }
         }
-
-        // Remove item from cart
         async function removeItem(itemId) {
             const token = localStorage.getItem('jwtToken');
             try {
@@ -244,7 +211,6 @@
                         'Authorization': `Bearer ${token}`
                     }
                 });
-
                 if (response.ok) {
                     loadCart();
                     showAlert('Item removed from cart', 'success');
@@ -255,11 +221,8 @@
                 showAlert('An error occurred', 'danger');
             }
         }
-
-        // Clear cart
         async function clearCart() {
             if (!confirm('Are you sure you want to clear your cart?')) return;
-
             const token = localStorage.getItem('jwtToken');
             try {
                 const response = await fetch('/api/cart/clear', {
@@ -268,7 +231,6 @@
                         'Authorization': `Bearer ${token}`
                     }
                 });
-
                 if (response.ok) {
                     loadCart();
                     showAlert('Cart cleared successfully', 'success');
@@ -279,8 +241,6 @@
                 showAlert('An error occurred', 'danger');
             }
         }
-
-        // Checkout
         async function checkout() {
             const token = localStorage.getItem('jwtToken');
             try {
@@ -290,7 +250,6 @@
                         'Authorization': `Bearer ${token}`
                     }
                 });
-
                 if (response.ok) {
                     showAlert('Order placed successfully!', 'success');
                     setTimeout(() => {
@@ -303,19 +262,15 @@
                 showAlert('An error occurred', 'danger');
             }
         }
-
-        // Show alert messages
         function showAlert(message, type) {
             const alertContainer = document.getElementById('alertContainer');
             const alertId = 'alert-' + Date.now();
-            
             alertContainer.innerHTML += `
                 <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `;
-
             setTimeout(() => {
                 const alert = document.getElementById(alertId);
                 if (alert) {
